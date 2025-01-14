@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: upwork
+      POSTGRES_PASSWORD: upwork123
+      POSTGRES_DB: upwork
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  auth:
+    build: ./services/auth
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=postgresql://upwork:upwork123@postgres:5432/upwork
+      - JWT_SECRET=your_secret_key_here
+      - PORT=3001
+      - CORS_ORIGIN=http://localhost:5173
+    depends_on:
+      - postgres
+
+  jobs:
+    build: ./services/jobs
+    ports:
+      - "3002:3002"
+    environment:
+      - DATABASE_URL=postgresql://upwork:upwork123@postgres:5432/upwork
+      - JWT_SECRET=your_secret_key_here
+      - PORT=3002
+      - CORS_ORIGIN=http://localhost:5173
+    depends_on:
+      - postgres
+
+  proposals:
+    build: ./services/proposals
+    ports:
+      - "3003:3003"
+    environment:
+      - DATABASE_URL=postgresql://upwork:upwork123@postgres:5432/upwork
+      - JWT_SECRET=your_secret_key_here
+      - PORT=3003
+      - CORS_ORIGIN=http://localhost:5173
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
